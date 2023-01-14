@@ -1,0 +1,2 @@
+class JsonAssertError(AssertionError):
+    pass
