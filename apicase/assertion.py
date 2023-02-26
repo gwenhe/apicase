@@ -1,25 +1,25 @@
-from pydantic import Field
 from typing import Union, List, Any
-from pydantic import BaseModel
 import jmespath
 from apicase.common.exception import JsonAssertError
 from apicase.common.enumeration import ComparatorEnum
+from apicase.common.schema import JSONAssertSchema
 
 
-class JSONAssertSchema(BaseModel):
-    expression: str = Field(...)
-    comparator: ComparatorEnum
-    value: Any = Field(...)
+class Asserter(object):
+
+    def _assert(self):
+        pass
 
 
-class JSONAsserter(object):
+class JSONAsserter(Asserter):
     assert_list = List[JSONAssertSchema]
     assert_results_list = List
 
-    def __init__(self, a_list: list, equal_type: bool = True):
+    def __init__(self, a_list: list, response_json: Union[dict, list], equal_type: bool = True, ):
         self.a_list = a_list
         self.equal_type = equal_type
         self.init_data()
+        self.json_assert(response_json)
 
     def init_data(self):
         assert_list = []
@@ -65,9 +65,16 @@ class JSONAsserter(object):
         raise JsonAssertError('JSON 断言失败' + error_str)
 
 
-class ResponseAsserter:
+class ResponseAsserter(Asserter):
     pass
 
 
-class CustomAsserter:
-    pass
+class CustomAsserter(Asserter):
+
+    def __init__(self, a_list, response):
+        self.a_list = a_list
+        self.response = response
+
+    def _assert(self):
+        for i in self.a_list:
+            i(self.response)

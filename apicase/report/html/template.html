@@ -1,0 +1,191 @@
+<head>
+    <meta content="text/html; charset=utf-8" http-equiv="content-type"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{html_report_name}} - TestReport</title>
+    <style>
+        body {
+            background-color: #f2f2f2;
+            color: #333;
+            margin: 0 auto;
+            width: 96%;
+            height: 800px;
+        }
+
+        pre {
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+
+        #summary th {
+            background-color: skyblue;
+            padding: 5px 12px;
+        }
+
+        #summary td {
+            background-color: lightblue;
+            text-align: center;
+            padding: 4px 8px;
+            word-wrap: break-word;
+            word-break: break-all;
+        }
+
+        .details {
+            width: 960px;
+            margin-bottom: 20px;
+        }
+
+        .details th {
+            background-color: skyblue;
+            padding: 5px 12px;
+        }
+
+        .details tr .passed {
+            background-color: lightgreen;
+        }
+
+        .details tr .failed {
+            background-color: red;
+        }
+
+        .details tr .unchecked {
+            background-color: gray;
+        }
+
+        .details td {
+            background-color: lightblue;
+            padding: 5px 12px;
+            word-wrap: break-word;
+            word-break: break-all;
+        }
+
+
+        .popup h2 {
+            margin-top: 0;
+            color: #333;
+            font-family: Tahoma, Arial, sans-serif;
+        }
+
+
+    </style>
+</head>
+
+<body>
+
+<h3>Name: {{ name }}</h3>
+
+<h3>Request:</h3>
+<div style="overflow: auto">
+    <table class="details">
+        {% for key, value in request.items() %}
+        <tr>
+            <th>{{key}}</th>
+            <td>
+                {% if key in ["headers", "body", "url"] %}
+                <pre>{{ value | e }}</pre>
+                {% else %}
+                {{value}}
+                {% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+</div>
+
+<h3>Response:</h3>
+<div style="overflow: auto">
+    <table class="details">
+        {% for key, value in response.items() %}
+        <tr>
+            <th>{{key}}</th>
+            <td>
+                {% if key == "headers" %}
+                <pre>{{ value | e }}</pre>
+                {% elif key == "body" %}
+                {% if "image" in response.content_type %}
+                <img src="{{ response.content }}"/>
+                {% else %}
+                <pre>{{ value | e }}</pre>
+                {% endif %}
+                {% else %}
+                {{ value }}
+                {% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+</div>
+
+<h3>Validators:</h3>
+<div style="overflow: auto">
+    {% set validate_extractors = validators.validate_extractor %}
+    {% if validate_extractors %}
+    <table class="details">
+        <tr>
+            <th>结果</th>
+            <th>检查</th>
+            <th>比较器</th>
+            <th>期望</th>
+            <th>实际</th>
+        </tr>
+        {% for validator in validate_extractors %}
+        <tr>
+            {% if validator.check == "pass" %}
+            <td class="passed">
+                {% elif validator.check == "fail" %}
+            <td class="failed">
+                {% elif validator.check == "unchecked" %}
+            <td class="unchecked">
+                {% endif %}
+                {{validator.check | e}}
+            </td>
+            <td>{{validator.jmespath}}</td>
+            <td>{{validator.comparator}}</td>
+            <td>{{validator.expectations | e}}</td>
+            <td>{{validator.value | e}}</td>
+        </tr>
+        {% endfor %}
+    </table>
+    {% endif %}
+
+    {% set validate_script = validators.validate_script %}
+    {% if validate_script %}
+    <table class="details">
+        <tr>
+            <th>断言脚本</th>
+            <th>异常</th>
+        </tr>
+        <tr>
+            <td>{{validate_script.validate_script | safe}}</td>
+            {% if validate_script.check_result == "pass" %}
+            <td class="passed">
+                {% elif validate_script.check_result == "fail" %}
+            <td class="failed">
+                {% endif %}
+                {{validate_script.exception}}
+            </td>
+        </tr>
+    </table>
+    {% endif %}
+</div>
+
+<h3>Statistics:</h3>
+<div style="overflow: auto">
+    <table class="details">
+        <tr>
+            <th>content_size(bytes)</th>
+            <td>{{ stat.content_size }}</td>
+        </tr>
+        <tr>
+            <th>response_time(ms)</th>
+            <td>{{ stat.response_time_ms }}</td>
+        </tr>
+        <tr>
+            <th>elapsed(ms)</th>
+            <td>{{ stat.elapsed_ms }}</td>
+        </tr>
+    </table>
+</div>
+
+
+</body>

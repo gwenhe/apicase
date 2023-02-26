@@ -1,11 +1,14 @@
 from pydantic import BaseModel, Field
 from typing import Optional, Union, Dict, List, Any
 from apicase.common.enumeration import (
-    BodyTypeEnum, ComparatorEnum
+    BodyTypeEnum, ComparatorEnum, CheckResultEnum
 )
 
 
 class RequestSchema(BaseModel):
+    """
+    http请求数据类
+    """
     url: str = Field(..., description='请求路径')
     method: str = Field(..., description='请求方法')
     body_type: BodyTypeEnum = Field(BodyTypeEnum.NULL, description='请求体类型')
@@ -21,6 +24,11 @@ class RequestSchema(BaseModel):
 
 
 class JSONAssertSchema(BaseModel):
-    expression: str = Field(...)
-    comparator: ComparatorEnum
-    value: Any = Field(...)
+    """
+    json 断言数据类
+    """
+    check: CheckResultEnum = Field(CheckResultEnum.UNCHECKED.value, description='断言结果')
+    jmespath: str = Field(..., description='jmes路径')
+    expectations: Any = Field(..., description='期望值')
+    comparator: Any = Field(..., description='断言器函数')
+    value: Any = Field(None, description='提取值')

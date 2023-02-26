@@ -14,3 +14,9 @@ class ComparatorEnum(Enum):
     EQUAL = '='
     GREATER = '>'
     LESS = '<'
+
+
+class CheckResultEnum(Enum):
+    PASS = 'pass'
+    FAIL = 'fail'
+    UNCHECKED = 'unchecked'
