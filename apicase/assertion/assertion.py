@@ -22,20 +22,7 @@ class JSONAsserter(Asserter):
                  equal_type: bool = True, ):
         self.assert_list = assert_list
         self.equal_type = equal_type
-        # self.init_data()
         self.json_assert(response_json)
-
-    # def init_data(self):
-    #     """
-    #     将断言列表转换为JSONAssertSchema 格式
-    #     :return:
-    #     """
-    #     assert_list = []
-    #     for i in self.a_list:
-    #         assert_list.append(
-    #             JSONAssertSchema(jmespath=i[0], comparator=i[1], expectations=i[2])
-    #         )
-    #     self.assert_list = assert_list
 
     def json_assert(self, response_json: Union[dict, list]):
         """
@@ -54,28 +41,6 @@ class JSONAsserter(Asserter):
                 i.check = CheckResultEnum.PASS
             assert_results_list.append(i)
         self.assert_results_list = assert_results_list
-        # self._assert()
-
-    # def _assert(self):
-    #     error_list = []
-    #     for i in self.assert_results_list:
-    #         if not i.check:
-    #             error_list.append(i)
-    #     error_str = ''
-    # for i in error_list:
-    #     assert_example = i[2]
-    #     value = str(assert_example.value)
-    #     assert_value = str(i[0])
-    #     comparator = assert_example.comparator
-    #     expression = assert_example.expression
-    #     error_str += '\n\t JSON.{expression} {comparator} {value} \t' \
-    #                  'But: {assert_value} not {comparator} {value}'.format(expression=expression,
-    #                                                                        comparator=comparator.value,
-    #                                                                        value=value,
-    #                                                                        assert_value=assert_value,
-    #                                                                        )
-    # raise JsonAssertError('JSON 断言失败' + error_str)
-    # print('断言通过', str(self.assert_results_list))
 
 
 class ResponseAsserter(Asserter):

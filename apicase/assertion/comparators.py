@@ -4,6 +4,7 @@ Built-in validate comparators.
 
 import re
 from apicase.common.schema import JSONAssertSchema
+from typing import Any
 
 
 def _cast_to_int(expect_value):
@@ -13,7 +14,6 @@ def _cast_to_int(expect_value):
         raise AssertionError("%r can't cast to int" % str(expect_value))
 
 
-# from httprunner.compat import basestring, builtin_str, integer_types
 def equals(check_value, expect_value):
     assert check_value == expect_value
 
@@ -53,7 +53,7 @@ def length_greater_than(check_value, expect_value):
     expect_len = _cast_to_int(expect_value)
     assert len(str(check_value)) > expect_len
 
-length_greater_than('10008', 1)
+
 # def length_greater_than_or_equals(check_value, expect_value):
 #     assert isinstance(expect_value, integer_types)
 #     expect_len = _cast_to_int(expect_value)
@@ -80,23 +80,23 @@ length_greater_than('10008', 1)
 # def contained_by(check_value, expect_value):
 #     assert isinstance(expect_value, (list, tuple, dict, basestring))
 #     assert check_value in expect_value
-#
-#
-# def type_match(check_value, expect_value):
-#     def get_type(name):
-#         if isinstance(name, type):
-#             return name
-#         elif isinstance(name, basestring):
-#             try:
-#                 return __builtins__[name]
-#             except KeyError:
-#                 raise ValueError(name)
-#         else:
-#             raise ValueError(name)
-#
-#     assert isinstance(check_value, get_type(expect_value))
-#
-#
+
+
+def type_match(check_value, expect_value):
+    def get_type(name):
+        if isinstance(name, type):
+            return name
+        elif isinstance(name, str):
+            try:
+                return __builtins__[name]
+            except KeyError:
+                raise ValueError(name)
+        else:
+            raise ValueError(name)
+
+    assert isinstance(check_value, get_type(expect_value))
+
+
 # def regex_match(check_value, expect_value):
 #     assert isinstance(expect_value, basestring)
 #     assert isinstance(check_value, basestring)
@@ -171,6 +171,13 @@ class AssertJson:
         长度大于
         """
         return JSONAssertSchema(jmespath=jmespath, expectations=expect_value, comparator=length_greater_than)
+
+    @staticmethod
+    def type_match(jmespath, expect_value: Any):
+        """
+        类型匹配
+        """
+        return JSONAssertSchema(jmespath=jmespath, expectations=expect_value, comparator=type_match)
 
 
 assertJSON = AssertJson()

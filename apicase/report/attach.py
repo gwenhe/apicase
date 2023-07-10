@@ -32,6 +32,11 @@ class AllureAttach(object):
             validate_extractor.append(k)
         title_name = "Request.{0}: {1} {2}".format(response.request.method, path, description)
         content_size = int(dict(response.headers).get("content-length") or 0)
+        if isinstance(response.request.body, bytes):
+            try:
+                response.request.body = str(response.request.body, 'utf-8')
+            except UnicodeDecodeError as e:
+                response.request.body = str(e)
         summary = {
             'name': description,
             'path': response.request.url,
@@ -61,7 +66,6 @@ class AllureAttach(object):
         body = gen_html_report(summary=summary)
         # log.debug(summary)
         allure.attach(body=body, name=title_name, attachment_type=allure.attachment_type.HTML)
-        # 记录后，抛出断言错误
 
     @staticmethod
     def headers_format(headers: dict):
